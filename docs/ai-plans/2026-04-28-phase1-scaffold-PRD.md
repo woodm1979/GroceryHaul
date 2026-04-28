@@ -44,3 +44,12 @@ Generate a Phoenix application with UUID primary keys and LiveView, wire in Comm
 ## Open questions
 
 - [ ] Confirm Elixir 1.18.x + OTP 27.x are the correct latest stable versions at execution time (pin whatever is latest then)
+
+## Future Considerations
+
+- **EventStore schema isolation per env** — dev and test each use a separate EventStore database (`_dev_eventstore`, `_test_eventstore`), but both share the same `event_store` schema prefix. If multi-tenant or partition-based testing is ever needed, consider per-test EventStore reset helpers similar to `Ecto.Adapters.SQL.Sandbox`.
+- **`_build` CI cache invalidation** — the CI workflow caches `_build` keyed on `mix.lock`, but compiled artifacts are also sensitive to Elixir/OTP version changes. If `.mise.toml` is bumped without touching `mix.lock`, cached `_build` artifacts may cause subtle compile errors. Consider adding `.mise.toml` to the cache key.
+- **`mix event_store.drop` alias** — `mix ecto.reset` drops and recreates the Ecto DB, but there is no equivalent `event_store.reset` alias. Developers doing full teardown must run it manually; adding one would simplify the workflow.
+- **Fly.io release config** — `runtime.exs` reads `DATABASE_URL` and `EVENT_STORE_DATABASE_URL` separately, but Fly.io's Postgres attachment only sets one `DATABASE_URL`. Phase 4 deploy will fail until `EVENT_STORE_DATABASE_URL` is explicitly set (or the runtime config is changed to default to `DATABASE_URL` for both — which is already done, but worth validating on first real deploy).
+- **Dialyzer baseline PLT** — `dialyxir` is installed but no PLT is committed or cached in CI. First `mix dialyzer` run will be slow. Consider adding a `_build/**/.dialyzer_*` entry to the CI cache or committing a PLT seed when the project matures.
+- **Lefthook CI enforcement** — pre-commit hooks are local-only; a developer can bypass them with `--no-verify`. The `mix format --check-formatted` and `mix credo` checks are not currently run in CI. Adding them as a `lint` job in `ci.yml` would close that gap.
