@@ -2,7 +2,7 @@
 
 > PRD: ./2026-04-28-phase2-auth-households-PRD.md
 > Executor: /build
-> Created: 2026-04-28  |  Last touched: 2026-04-28  (Section 1 completed 2026-04-28)
+> Created: 2026-04-28  |  Last touched: 2026-04-28  (Section 2 completed 2026-04-28)
 
 ## Architectural decisions
 
@@ -65,7 +65,7 @@ A `User` Commanded aggregate that handles `RegisterUser` → `UserRegistered`. A
 
 ## Section 2: Household creation and post-login flow
 
-**Status:** [ ] not started
+**Status:** [x] complete
 **Model:** sonnet
 **User stories covered:** 3
 
@@ -75,13 +75,13 @@ A `Household` Commanded aggregate handling `CreateHousehold` → `HouseholdCreat
 
 ### Acceptance criteria
 
-- [ ] A logged-in user can create a household by providing a name; they are redirected to a household dashboard.
-- [ ] The creating user appears as admin in the `HouseholdMembersProjection` immediately after creation.
-- [ ] A user who is not yet in any household is redirected to the "create or join" screen after login.
-- [ ] A user who already has a household is redirected to their household dashboard after login.
-- [ ] `HouseholdCreated` and `MemberJoined` (with role `:admin`) events appear in the event store after household creation.
-- [ ] Aggregate unit tests cover: successful household creation, membership aggregate initialized with admin role.
-- [ ] Integration test covers: create household end-to-end via LiveView.
+- [x] A logged-in user can create a household by providing a name; they are redirected to a household dashboard.
+- [x] The creating user appears as admin in the `HouseholdMembersProjection` immediately after creation.
+- [x] A user who is not yet in any household is redirected to the "create or join" screen after login.
+- [x] A user who already has a household is redirected to their household dashboard after login.
+- [x] `HouseholdCreated` and `MemberJoined` (with role `:admin`) events appear in the event store after household creation.
+- [x] Aggregate unit tests cover: successful household creation, membership aggregate initialized with admin role.
+- [x] Integration test covers: create household end-to-end via LiveView.
 
 ### Notes for executor
 
@@ -92,10 +92,9 @@ A `Household` Commanded aggregate handling `CreateHousehold` → `HouseholdCreat
 
 ### Completion log
 
-<!-- Executor fills in after section completes -->
-- Commits:
-- Tests added:
-- Deviations from plan:
+- Commits: 81c0bc0
+- Tests added: 16 (5 aggregate unit, 5 context integration, 6 LiveView)
+- Deviations from plan: JoinHousehold command uses explicit membership_id field (composite "hh_id:user_id" string) rather than an anonymous-function identity (Commanded restriction). Role string-to-atom coercion in HouseholdMembersProjector (in-memory JSON serialization returns strings). Two sequential dispatches in create_household/2 (not atomic) — process manager deferred per plan note.
 
 ---
 
