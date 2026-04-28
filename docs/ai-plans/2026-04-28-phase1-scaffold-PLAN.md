@@ -2,7 +2,7 @@
 
 > PRD: ./2026-04-28-phase1-scaffold-PRD.md
 > Executor: /build
-> Created: 2026-04-28  |  Last touched: 2026-04-28 (build started)
+> Created: 2026-04-28  |  Last touched: 2026-04-28
 
 ## Architectural decisions
 
@@ -27,7 +27,7 @@
 
 ## Section 1: Phoenix app + Docker Compose
 
-**Status:** [ ] not started
+**Status:** [x] complete
 **Model:** haiku
 **User stories covered:** 1, 2
 
@@ -37,10 +37,10 @@ Generate the Phoenix application with UUID PKs and no mailer, add a `docker-comp
 
 ### Acceptance criteria
 
-- [ ] `mix phx.new grocery_haul --binary-id --no-mailer` generates the project (committed output)
-- [ ] `docker compose up -d` starts a Postgres 16 container on port 5432
-- [ ] `mix test` passes with the Docker Compose Postgres running
-- [ ] `.mise.toml` pins Elixir and OTP to the latest stable versions
+- [x] `mix phx.new grocery_haul --binary-id --no-mailer` generates the project (committed output)
+- [x] `docker compose up -d` starts a Postgres 16 container on port 5432
+- [x] `mix test` passes with the Docker Compose Postgres running
+- [x] `.mise.toml` pins Elixir and OTP to the latest stable versions
 
 ### Notes for executor
 
@@ -51,10 +51,9 @@ Generate the Phoenix application with UUID PKs and no mailer, add a `docker-comp
 
 ### Completion log
 
-<!-- Executor fills in after section completes -->
-- Commits:
-- Tests added:
-- Deviations from plan:
+- Commits: 6d920d9 57b4f86
+- Tests added: 0 (5 Phoenix-generated tests pass)
+- Deviations from plan: Initially used port 5433 (local conflict); remediated to 5432 per spec. Used Elixir 1.19.4/OTP 28 (latest stable) instead of plan note 1.18.x/OTP 27.x.
 
 ---
 
