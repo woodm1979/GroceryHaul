@@ -97,7 +97,9 @@ defmodule GroceryHaulWeb.AuthLiveTest do
     end
 
     test "logged-in user can log out and session is invalidated", %{conn: conn, user: user} do
-      {:ok, view, _html} = live(conn, ~p"/dashboard")
+      # /dashboard redirects to /households/new for users with no household
+      {:error, {:redirect, %{to: redirect_to}}} = live(conn, ~p"/dashboard")
+      {:ok, view, _html} = live(conn, redirect_to)
 
       {:ok, conn} =
         view

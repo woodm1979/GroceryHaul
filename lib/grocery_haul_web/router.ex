@@ -33,6 +33,8 @@ defmodule GroceryHaulWeb.Router do
     pipe_through [:browser, :require_auth]
 
     live "/dashboard", DashboardLive, :index
+    live "/households/new", HouseholdLive.New, :new
+    live "/households/:id", HouseholdLive.Show, :show
   end
 
   # Other scopes may use custom stacks.

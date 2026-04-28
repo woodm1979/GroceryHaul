@@ -1,26 +1,36 @@
 defmodule GroceryHaulWeb.DashboardLive do
   use GroceryHaulWeb, :live_view
 
-  def render(assigns) do
-    ~H"""
-    <div class="max-w-2xl mx-auto mt-16">
-      <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
-      <p>Welcome, {@current_user.email}!</p>
-      <.link href={~p"/logout"} method="delete" class="mt-4 inline-block text-red-600">
-        Log out
-      </.link>
-    </div>
-    """
-  end
+  alias GroceryHaul.Accounts
+  alias GroceryHaul.Households
 
   def mount(_params, session, socket) do
     token = session["user_token"]
-    user = token && GroceryHaul.Accounts.get_user_by_token(token)
+    user = token && Accounts.get_user_by_token(token)
 
     if user do
-      {:ok, assign(socket, current_user: user)}
+      case Households.list_households_for_user(user.id) do
+        [] ->
+          {:ok, redirect(socket, to: ~p"/households/new")}
+
+        [household] ->
+          {:ok, redirect(socket, to: ~p"/households/#{household.id}")}
+
+        _multiple ->
+          {:ok, assign(socket, current_user: user)}
+      end
     else
       {:ok, redirect(socket, to: ~p"/login")}
     end
+  end
+
+  # Only rendered when user has multiple households (picker)
+  def render(assigns) do
+    ~H"""
+    <div class="max-w-2xl mx-auto mt-16">
+      <h1 class="text-2xl font-bold mb-4">Your Households</h1>
+      <p>Welcome, {@current_user.email}!</p>
+    </div>
+    """
   end
 end
