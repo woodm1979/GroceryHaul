@@ -2,7 +2,7 @@
 
 > PRD: ./2026-04-28-phase2-auth-households-PRD.md
 > Executor: /build
-> Created: 2026-04-28  |  Last touched: 2026-04-28  (Section 2 completed 2026-04-28)
+> Created: 2026-04-28  |  Last touched: 2026-04-28
 
 ## Architectural decisions
 
