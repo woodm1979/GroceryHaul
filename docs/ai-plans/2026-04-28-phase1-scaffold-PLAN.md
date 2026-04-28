@@ -92,7 +92,7 @@ Add `commanded`, `commanded_eventstore_adapter`, and `eventstore` deps, configur
 
 ## Section 3: Dev tooling (Lefthook + Credo)
 
-**Status:** [ ] not started
+**Status:** [x] complete
 **Model:** haiku
 **User stories covered:** 3
 
@@ -102,10 +102,10 @@ Add `credo` as a dev/test dep, generate `.credo.exs`, create `lefthook.yml` with
 
 ### Acceptance criteria
 
-- [ ] `mix credo` runs without crashing
-- [ ] `lefthook.yml` has a `pre-commit` section running format check and credo
-- [ ] Attempting to commit unformatted code triggers the hook and blocks the commit
-- [ ] `CLAUDE.md` notes that `lefthook install` must be run after cloning
+- [x] `mix credo` runs without crashing
+- [x] `lefthook.yml` has a `pre-commit` section running format check and credo
+- [x] Attempting to commit unformatted code triggers the hook and blocks the commit
+- [x] `CLAUDE.md` notes that `lefthook install` must be run after cloning
 
 ### Notes for executor
 
@@ -116,10 +116,9 @@ Add `credo` as a dev/test dep, generate `.credo.exs`, create `lefthook.yml` with
 
 ### Completion log
 
-<!-- Executor fills in after section completes -->
-- Commits:
-- Tests added:
-- Deviations from plan:
+- Commits: e911799
+- Tests added: 0 (6 existing tests still pass)
+- Deviations from plan: none
 
 ---
 
