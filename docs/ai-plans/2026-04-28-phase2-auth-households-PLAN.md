@@ -2,7 +2,7 @@
 
 > PRD: ./2026-04-28-phase2-auth-households-PRD.md
 > Executor: /build
-> Created: 2026-04-28  |  Last touched: 2026-04-28
+> Created: 2026-04-28  |  Last touched: 2026-04-28  (Section 1 completed 2026-04-28)
 
 ## Architectural decisions
 
@@ -28,7 +28,7 @@
 
 ## Section 1: User registration and auth
 
-**Status:** [ ] not started
+**Status:** [x] complete
 **Model:** sonnet
 **User stories covered:** 1, 2
 
@@ -38,14 +38,14 @@ A `User` Commanded aggregate that handles `RegisterUser` → `UserRegistered`. A
 
 ### Acceptance criteria
 
-- [ ] A user can submit the registration form with a valid email and password and is redirected to a logged-in state.
-- [ ] Attempting to register with an already-registered email is rejected with a visible error message.
-- [ ] A registered user can log in with correct credentials and receive a session.
-- [ ] Logging in with an incorrect password is rejected with a visible error message.
-- [ ] A logged-in user can log out and their session is invalidated (subsequent protected page visit redirects to login).
-- [ ] `UserRegistered` event appears in the event store after a successful registration.
-- [ ] Aggregate unit tests cover: successful registration, duplicate email rejection.
-- [ ] Auth integration tests cover: register → login → logout round-trip.
+- [x] A user can submit the registration form with a valid email and password and is redirected to a logged-in state.
+- [x] Attempting to register with an already-registered email is rejected with a visible error message.
+- [x] A registered user can log in with correct credentials and receive a session.
+- [x] Logging in with an incorrect password is rejected with a visible error message.
+- [x] A logged-in user can log out and their session is invalidated (subsequent protected page visit redirects to login).
+- [x] `UserRegistered` event appears in the event store after a successful registration.
+- [x] Aggregate unit tests cover: successful registration, duplicate email rejection.
+- [x] Auth integration tests cover: register → login → logout round-trip.
 
 ### Notes for executor
 
@@ -57,10 +57,9 @@ A `User` Commanded aggregate that handles `RegisterUser` → `UserRegistered`. A
 
 ### Completion log
 
-<!-- Executor fills in after section completes -->
-- Commits:
-- Tests added:
-- Deviations from plan:
+- Commits: bbf0649 81bed94
+- Tests added: 22 (9 accounts unit/integration, 6 aggregate unit, 6 LiveView integration, 1 round-trip)
+- Deviations from plan: Used Commanded in-memory event store adapter in test env to avoid cross-run sandbox issues. Session bridging via GET /auth/session (redirect from LiveView). Email uniqueness checked via Repo.exists? pre-dispatch (TOCTOU tradeoff documented in arch decisions). UserProjector uses start_from: :current + on_conflict: :nothing for idempotent replay.
 
 ---
 
