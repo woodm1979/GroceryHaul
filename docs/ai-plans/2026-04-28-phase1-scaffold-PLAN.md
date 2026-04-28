@@ -2,7 +2,7 @@
 
 > PRD: ./2026-04-28-phase1-scaffold-PRD.md
 > Executor: /build
-> Created: 2026-04-28  |  Last touched: 2026-04-28
+> Created: 2026-04-28  |  Last touched: 2026-04-28  |  Last updated: 2026-04-28
 
 ## Architectural decisions
 
@@ -124,7 +124,7 @@ Add `credo` as a dev/test dep, generate `.credo.exs`, create `lefthook.yml` with
 
 ## Section 4: Fly.io + GitHub Actions
 
-**Status:** [ ] not started
+**Status:** [x] complete
 **Model:** sonnet
 **User stories covered:** 4
 
@@ -134,10 +134,10 @@ Create `fly.toml` for a `shared-cpu-1x 256 MB` machine in `iad`, and write `.git
 
 ### Acceptance criteria
 
-- [ ] `fly.toml` specifies app name, region `iad`, `shared-cpu-1x` machine, 256 MB RAM
-- [ ] `.github/workflows/ci.yml` runs `mix test` on every push and pull request
-- [ ] The deploy job only runs on `refs/heads/main` and has `needs: test`
-- [ ] A note in `CLAUDE.md` documents that `FLY_API_TOKEN` must be added as a GitHub Actions secret
+- [x] `fly.toml` specifies app name, region `iad`, `shared-cpu-1x` machine, 256 MB RAM
+- [x] `.github/workflows/ci.yml` runs `mix test` on every push and pull request
+- [x] The deploy job only runs on `refs/heads/main` and has `needs: test`
+- [x] A note in `CLAUDE.md` documents that `FLY_API_TOKEN` must be added as a GitHub Actions secret
 
 ### Notes for executor
 
@@ -148,7 +148,6 @@ Create `fly.toml` for a `shared-cpu-1x 256 MB` machine in `iad`, and write `.git
 
 ### Completion log
 
-<!-- Executor fills in after section completes -->
-- Commits:
-- Tests added:
-- Deviations from plan:
+- Commits: 08b0695
+- Tests added: 0 (no unit tests apply; CI/deploy config only)
+- Deviations from plan: Used `heroku/buildpacks:20` as builder placeholder in fly.toml (standard for Phoenix; actual builder configured at `fly launch` time). erlef/setup-beam@v1 reads .mise.toml directly for Elixir/OTP versions.
