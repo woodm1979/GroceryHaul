@@ -10,6 +10,7 @@ defmodule GroceryHaul.Application do
     children = [
       GroceryHaulWeb.Telemetry,
       GroceryHaul.Repo,
+      GroceryHaul.Commanded.Application,
       {DNSCluster, query: Application.get_env(:grocery_haul, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: GroceryHaul.PubSub},
       # Start a worker by calling: GroceryHaul.Worker.start_link(arg)

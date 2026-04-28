@@ -1,5 +1,12 @@
 import Config
 
+config :grocery_haul, GroceryHaul.EventStore,
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  port: 5432,
+  database: "grocery_haul_test_eventstore#{System.get_env("MIX_TEST_PARTITION")}"
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used

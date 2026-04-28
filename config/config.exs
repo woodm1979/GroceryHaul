@@ -9,6 +9,7 @@ import Config
 
 config :grocery_haul,
   ecto_repos: [GroceryHaul.Repo],
+  event_stores: [GroceryHaul.EventStore],
   generators: [timestamp_type: :utc_datetime, binary_id: true]
 
 # Configure the endpoint
@@ -50,6 +51,17 @@ config :logger, :default_formatter,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+config :grocery_haul, GroceryHaul.EventStore,
+  column_data_type: "jsonb",
+  serializer: EventStore.JsonbSerializer,
+  prefix: "event_store"
+
+config :grocery_haul, GroceryHaul.Commanded.Application,
+  event_store: [
+    adapter: Commanded.EventStore.Adapters.EventStore,
+    event_store: GroceryHaul.EventStore
+  ]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

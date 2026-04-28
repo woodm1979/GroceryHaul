@@ -1,5 +1,12 @@
 import Config
 
+config :grocery_haul, GroceryHaul.EventStore,
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  port: 5432,
+  database: "grocery_haul_dev_eventstore"
+
 # Configure your database
 config :grocery_haul, GroceryHaul.Repo,
   username: "postgres",
