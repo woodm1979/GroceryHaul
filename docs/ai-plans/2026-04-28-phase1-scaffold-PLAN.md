@@ -59,7 +59,7 @@ Generate the Phoenix application with UUID PKs and no mailer, add a `docker-comp
 
 ## Section 2: Commanded + EventStore
 
-**Status:** [ ] not started
+**Status:** [x] complete
 **Model:** sonnet
 **User stories covered:** 5
 
@@ -69,10 +69,10 @@ Add `commanded`, `commanded_eventstore_adapter`, and `eventstore` deps, configur
 
 ### Acceptance criteria
 
-- [ ] `mix deps.get` resolves without conflicts
-- [ ] `mix event_store.init` creates EventStore tables under the `event_store` schema
-- [ ] `GroceryHaul.Commanded.Application` starts without error when `mix test` runs
-- [ ] `mix test` still passes after wiring in Commanded
+- [x] `mix deps.get` resolves without conflicts
+- [x] `mix event_store.init` creates EventStore tables under the `event_store` schema
+- [x] `GroceryHaul.Commanded.Application` starts without error when `mix test` runs
+- [x] `mix test` still passes after wiring in Commanded
 
 ### Notes for executor
 
@@ -84,10 +84,9 @@ Add `commanded`, `commanded_eventstore_adapter`, and `eventstore` deps, configur
 
 ### Completion log
 
-<!-- Executor fills in after section completes -->
-- Commits:
-- Tests added:
-- Deviations from plan:
+- Commits: dc56baa
+- Tests added: 1
+- Deviations from plan: Plan notes referenced `EventStore.JsonBase64Serializer` which doesn't exist in eventstore 1.4.x; used `EventStore.JsonbSerializer` with `column_data_type: "jsonb"` (correct modern API). EventStore supervised internally by Commanded adapter (not as separate supervision child); effective order is still Repo → Commanded.Application(→EventStore) → Endpoint.
 
 ---
 
