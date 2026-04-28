@@ -66,7 +66,9 @@ defmodule GroceryHaul.MixProject do
       {:bandit, "~> 1.5"},
       {:commanded, "~> 1.4"},
       {:commanded_eventstore_adapter, "~> 1.4"},
-      {:eventstore, "~> 1.4"}
+      {:eventstore, "~> 1.4"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false}
     ]
   end
 

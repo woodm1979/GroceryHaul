@@ -1,0 +1,6 @@
+pre-commit:
+  commands:
+    format:
+      run: mix format --check-formatted
+    credo:
+      run: mix credo
