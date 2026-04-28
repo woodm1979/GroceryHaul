@@ -80,10 +80,23 @@ defmodule GroceryHaul.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup", "event_store.create", "event_store.init", "assets.setup", "assets.build"],
+      setup: [
+        "deps.get",
+        "ecto.setup",
+        "event_store.create",
+        "event_store.init",
+        "assets.setup",
+        "assets.build"
+      ],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "event_store.create --quiet", "event_store.init --quiet", "test"],
+      test: [
+        "ecto.create --quiet",
+        "ecto.migrate --quiet",
+        "event_store.create --quiet",
+        "event_store.init --quiet",
+        "test"
+      ],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["compile", "tailwind grocery_haul", "esbuild grocery_haul"],
       "assets.deploy": [
@@ -91,6 +104,7 @@ defmodule GroceryHaul.MixProject do
         "esbuild grocery_haul --minify",
         "phx.digest"
       ],
+      "event_store.reset": ["event_store.drop", "event_store.create", "event_store.init"],
       precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
     ]
   end
