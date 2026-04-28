@@ -1,0 +1,25 @@
+You are a code-quality reviewer for Section 1: Phoenix app + Docker Compose. A separate reviewer has already verified spec compliance — focus on craft.
+
+## Repo root
+/Users/woodnt/Code/src/github.com/woodm1979/GroceryHaul
+
+## Pre-section SHA: 205e90f6834a62872075aaa414bf3a5a41600601
+
+Fetch the diff yourself:
+  git diff 205e90f6834a62872075aaa414bf3a5a41600601..HEAD
+
+## What to assess
+- Is the code idiomatic for the language/framework it's in?
+- Are tests meaningful (not mock-verification theater)?
+- Any obvious security, concurrency, or correctness pitfalls?
+- Is the code appropriately sized for the scope (not under- or over-engineered)?
+- Does it follow project conventions visible in the surrounding codebase?
+- Does each new file have one clear responsibility with a well-defined interface?
+- Did this change create files that are already large, or grow existing files significantly? (Don't flag pre-existing size — focus on what this change contributed.)
+
+## Output
+Bullet list of findings. Tag each BLOCKING or SUGGESTION. If none: "No issues found."
+
+End with exactly one of:
+- APPROVED
+- NEEDS FIXES followed by a numbered list of BLOCKING fixes
