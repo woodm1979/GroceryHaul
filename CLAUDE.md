@@ -23,3 +23,7 @@ After cloning, run `lefthook install` once to activate the git pre-commit hooks 
 GroceryHaul is an Elixir application (framework TBD). The project is in early scaffolding — no source files exist yet beyond `.gitignore`.
 
 Config secrets live in `config/*.secret.exs` (gitignored).
+
+## GitHub Actions secrets
+
+Add `FLY_API_TOKEN` as a repository secret in GitHub (Settings → Secrets and variables → Actions) before the deploy job can run. Generate the token with `fly tokens create deploy`.
