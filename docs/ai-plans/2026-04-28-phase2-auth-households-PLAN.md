@@ -2,7 +2,7 @@
 
 > PRD: ./2026-04-28-phase2-auth-households-PRD.md
 > Executor: /build
-> Created: 2026-04-28  |  Last touched: 2026-04-28
+> Created: 2026-04-28  |  Last touched: 2026-04-28  (Section 3 completed 2026-04-28)
 
 ## Architectural decisions
 
@@ -100,7 +100,7 @@ A `Household` Commanded aggregate handling `CreateHousehold` → `HouseholdCreat
 
 ## Section 3: Join code generation and joining
 
-**Status:** [ ] not started
+**Status:** [x] complete
 **Model:** sonnet
 **User stories covered:** 4, 5
 
@@ -128,10 +128,9 @@ A `Household` Commanded aggregate handling `CreateHousehold` → `HouseholdCreat
 
 ### Completion log
 
-<!-- Executor fills in after section completes -->
-- Commits:
-- Tests added:
-- Deviations from plan:
+- Commits: 5daae6b
+- Tests added: 16 (3 aggregate unit, 7 context integration, 4 LiveView, 2 probabilistic/edge)
+- Deviations from plan: JoinCodeProjector uses start_from: :current (consistent with other projectors). JoinCodeIndex primary key is the code string (lookup by PK). OTP/Elixir version mismatch in .mise.toml fixed alongside (erlang pinned to 28.2).
 
 ---
 
