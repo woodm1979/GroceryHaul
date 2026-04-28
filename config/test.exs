@@ -28,6 +28,13 @@ config :grocery_haul, GroceryHaulWeb.Endpoint,
   secret_key_base: "o4N0fYyC471y16EXRs7G9+Y4cH3iwVfzks775TyQo2NfWqza0KEjDv9zAp2XZpZ3",
   server: false
 
+# Use in-memory event store for tests (no persistent state between runs)
+config :grocery_haul, GroceryHaul.Commanded.Application,
+  event_store: [
+    adapter: Commanded.EventStore.Adapters.InMemory,
+    serializer: Commanded.Serialization.JsonSerializer
+  ]
+
 # Print only warnings and errors during test
 config :logger, level: :warning
 

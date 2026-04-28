@@ -14,10 +14,25 @@ defmodule GroceryHaulWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :require_auth do
+    plug GroceryHaulWeb.Plugs.RequireAuth
+  end
+
   scope "/", GroceryHaulWeb do
     pipe_through :browser
 
     get "/", PageController, :home
+    live "/register", AuthLive.Register, :register
+    live "/login", AuthLive.Login, :login
+    get "/auth/session", AuthController, :create
+    delete "/logout", AuthController, :delete
+    get "/logout", AuthController, :delete
+  end
+
+  scope "/", GroceryHaulWeb do
+    pipe_through [:browser, :require_auth]
+
+    live "/dashboard", DashboardLive, :index
   end
 
   # Other scopes may use custom stacks.

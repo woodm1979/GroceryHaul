@@ -9,6 +9,7 @@ defmodule GroceryHaul.Application do
       GroceryHaulWeb.Telemetry,
       GroceryHaul.Repo,
       GroceryHaul.Commanded.Application,
+      GroceryHaul.Accounts.UserProjector,
       {DNSCluster, query: Application.get_env(:grocery_haul, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: GroceryHaul.PubSub},
       GroceryHaulWeb.Endpoint
