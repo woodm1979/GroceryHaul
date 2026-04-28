@@ -1,9 +1,9 @@
 defmodule GroceryHaul.Accounts.UserAggregateTest do
   use ExUnit.Case, async: true
 
-  alias GroceryHaul.Accounts.User
   alias GroceryHaul.Accounts.Commands.RegisterUser
   alias GroceryHaul.Accounts.Events.UserRegistered
+  alias GroceryHaul.Accounts.User
 
   describe "RegisterUser" do
     test "successful registration emits UserRegistered" do

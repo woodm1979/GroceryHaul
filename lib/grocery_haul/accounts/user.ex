@@ -1,4 +1,5 @@
 defmodule GroceryHaul.Accounts.User do
+  @moduledoc false
   defstruct registered: false
 
   alias GroceryHaul.Accounts.Commands.RegisterUser

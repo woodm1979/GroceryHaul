@@ -1,4 +1,5 @@
 defmodule GroceryHaul.Accounts.UserProjector do
+  @moduledoc false
   use Commanded.Event.Handler,
     application: GroceryHaul.Commanded.Application,
     name: __MODULE__,

@@ -51,6 +51,25 @@ defmodule GroceryHaul.AccountsTest do
     end
   end
 
+  describe "register → login → logout round-trip" do
+    test "full auth lifecycle works end-to-end" do
+      # Register
+      assert {:ok, user_id} = Accounts.register_user("roundtrip@example.com", "password123")
+
+      # Login
+      assert {:ok, user} = Accounts.authenticate_user("roundtrip@example.com", "password123")
+      assert user.id == user_id
+
+      # Session token created
+      token = Accounts.create_user_token(user)
+      assert Accounts.get_user_by_token(token) != nil
+
+      # Logout
+      Accounts.delete_user_tokens(user)
+      assert Accounts.get_user_by_token(token) == nil
+    end
+  end
+
   describe "token lifecycle" do
     setup do
       {:ok, _} = Accounts.register_user("token@example.com", "password123")

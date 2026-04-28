@@ -1,4 +1,5 @@
 defmodule GroceryHaul.Accounts do
+  @moduledoc "Context for user accounts: registration, authentication, and session management."
   import Ecto.Query
 
   alias GroceryHaul.Accounts.Commands.RegisterUser
