@@ -12,6 +12,7 @@ defmodule GroceryHaul.Application do
       GroceryHaul.Accounts.UserProjector,
       GroceryHaul.Households.HouseholdProjector,
       GroceryHaul.Households.HouseholdMembersProjector,
+      GroceryHaul.Households.JoinCodeProjector,
       {DNSCluster, query: Application.get_env(:grocery_haul, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: GroceryHaul.PubSub},
       GroceryHaulWeb.Endpoint

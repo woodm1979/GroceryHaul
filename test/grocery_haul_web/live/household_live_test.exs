@@ -11,7 +11,8 @@ defmodule GroceryHaulWeb.HouseholdLiveTest do
     for projector <- [
           GroceryHaul.Accounts.UserProjector,
           GroceryHaul.Households.HouseholdProjector,
-          GroceryHaul.Households.HouseholdMembersProjector
+          GroceryHaul.Households.HouseholdMembersProjector,
+          GroceryHaul.Households.JoinCodeProjector
         ] do
       key =
         {GroceryHaul.Commanded.Application, Commanded.Event.Handler, inspect(projector)}
@@ -70,6 +71,36 @@ defmodule GroceryHaulWeb.HouseholdLiveTest do
 
       assert String.starts_with?(to, "/households/")
     end
+
+    test "user can join a household with a valid code and is redirected", %{conn: conn} do
+      # Creator sets up a household
+      creator_id = Ecto.UUID.generate()
+      {:ok, household_id} = Households.create_household(creator_id, "Join Me HH")
+      %{code: join_code} = Households.get_join_code(household_id)
+
+      # Joiner opens the new page and submits the join form
+      {conn, _user_id, _user} = register_and_login(conn, "joiner@example.com")
+      {:ok, view, _html} = live(conn, ~p"/households/new")
+
+      {:error, {:redirect, %{to: to}}} =
+        view
+        |> form("#join-household-form", join: %{code: join_code})
+        |> render_submit()
+
+      assert to == "/households/#{household_id}"
+    end
+
+    test "entering an invalid join code shows an error", %{conn: conn} do
+      {conn, _user_id, _user} = register_and_login(conn, "badjoin@example.com")
+      {:ok, view, _html} = live(conn, ~p"/households/new")
+
+      html =
+        view
+        |> form("#join-household-form", join: %{code: "BADCODE1"})
+        |> render_submit()
+
+      assert html =~ "Invalid join code"
+    end
   end
 
   describe "household dashboard" do
@@ -88,6 +119,23 @@ defmodule GroceryHaulWeb.HouseholdLiveTest do
       {:ok, _view, html} = live(conn, ~p"/households/#{household_id}")
       assert html =~ user.email
       assert html =~ "admin"
+    end
+
+    test "admin sees join code on dashboard", %{conn: conn, household_id: household_id} do
+      {:ok, _view, html} = live(conn, ~p"/households/#{household_id}")
+      assert html =~ "Join Code"
+    end
+
+    test "admin can regenerate join code", %{conn: conn, household_id: household_id} do
+      {:ok, view, html} = live(conn, ~p"/households/#{household_id}")
+      old_code = Households.get_join_code(household_id).code
+      assert html =~ old_code
+
+      html = view |> element("button[phx-click=\"regenerate_code\"]") |> render_click()
+
+      new_entry = Households.get_join_code(household_id)
+      assert new_entry.code != old_code
+      assert html =~ new_entry.code
     end
   end
 end

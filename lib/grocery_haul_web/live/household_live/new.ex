@@ -9,7 +9,13 @@ defmodule GroceryHaulWeb.HouseholdLive.New do
     user = token && Accounts.get_user_by_token(token)
 
     if user do
-      {:ok, assign(socket, current_user: user, form: to_form(%{}, as: :household), error: nil)}
+      {:ok,
+       assign(socket,
+         current_user: user,
+         form: to_form(%{}, as: :household),
+         join_form: to_form(%{}, as: :join),
+         error: nil
+       )}
     else
       {:ok, redirect(socket, to: ~p"/login")}
     end
@@ -36,18 +42,10 @@ defmodule GroceryHaulWeb.HouseholdLive.New do
 
       <div class="mt-8 border-t pt-6">
         <h2 class="text-lg font-semibold mb-4">Join an existing household</h2>
-        <.form id="join-household-form" for={to_form(%{}, as: :join)} phx-submit="join">
-          <.input
-            field={to_form(%{}, as: :join)[:code]}
-            name="join[code]"
-            type="text"
-            label="Join code"
-          />
-          <.button type="submit" phx-disable-with="Joining..." disabled>Join</.button>
+        <.form id="join-household-form" for={@join_form} phx-submit="join">
+          <.input field={@join_form[:code]} type="text" label="Join code" />
+          <.button type="submit" phx-disable-with="Joining...">Join</.button>
         </.form>
-        <p class="mt-2 text-sm text-gray-500">
-          Join code functionality coming soon.
-        </p>
       </div>
     </div>
     """
@@ -65,8 +63,21 @@ defmodule GroceryHaulWeb.HouseholdLive.New do
     end
   end
 
-  def handle_event("join", _params, socket) do
-    # Join logic ships in Section 3 — stub for now
-    {:noreply, assign(socket, error: "Join code functionality not yet available.")}
+  def handle_event("join", %{"join" => %{"code" => code}}, socket) do
+    user = socket.assigns.current_user
+
+    case Households.join_via_code(user.id, code) do
+      {:ok, household_id} ->
+        {:noreply, redirect(socket, to: ~p"/households/#{household_id}")}
+
+      {:error, :invalid_code} ->
+        {:noreply, assign(socket, error: "Invalid join code. Please check and try again.")}
+
+      {:error, :already_member} ->
+        {:noreply, assign(socket, error: "You are already a member of that household.")}
+
+      {:error, _} ->
+        {:noreply, assign(socket, error: "Failed to join household. Please try again.")}
+    end
   end
 end
