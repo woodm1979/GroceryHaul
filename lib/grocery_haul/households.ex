@@ -18,25 +18,16 @@ defmodule GroceryHaul.Households do
   alias GroceryHaul.Households.{HouseholdMembersProjection, HouseholdProjection, JoinCodeIndex}
   alias GroceryHaul.Repo
 
-  @doc "Creates a household and auto-joins the creator as admin."
+  @doc "Creates a household and auto-joins the creator as admin (via process manager)."
   def create_household(user_id, name) do
     household_id = Ecto.UUID.generate()
 
-    with :ok <-
-           App.dispatch(
-             %CreateHousehold{household_id: household_id, name: name, created_by: user_id},
-             consistency: :strong
-           ),
-         :ok <-
-           App.dispatch(
-             %JoinHousehold{
-               household_id: household_id,
-               user_id: user_id,
-               role: :admin
-             },
-             consistency: :strong
-           ) do
-      {:ok, household_id}
+    case App.dispatch(
+           %CreateHousehold{household_id: household_id, name: name, created_by: user_id},
+           consistency: :strong
+         ) do
+      :ok -> {:ok, household_id}
+      error -> error
     end
   end
 
