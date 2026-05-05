@@ -58,7 +58,10 @@ defmodule GroceryHaulWeb.HouseholdLive.Show do
       </ul>
 
       <%= if @my_role == :admin do %>
-        <.link navigate={~p"/households/#{@household.id}/settings"} class="mt-4 inline-block text-blue-600 underline">
+        <.link
+          navigate={~p"/households/#{@household.id}/settings"}
+          class="mt-4 inline-block text-blue-600 underline"
+        >
           Settings
         </.link>
       <% end %>

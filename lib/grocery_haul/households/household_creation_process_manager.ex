@@ -9,7 +9,7 @@ defmodule GroceryHaul.Households.HouseholdCreationProcessManager do
   alias GroceryHaul.Households.Events.HouseholdCreated
 
   @derive Jason.Encoder
-  defstruct [:household_id, membership_created: false]
+  defstruct [:household_id]
 
   def interested?(%HouseholdCreated{household_id: household_id}),
     do: {:start, household_id}
@@ -25,6 +25,6 @@ defmodule GroceryHaul.Households.HouseholdCreationProcessManager do
   end
 
   def apply(%__MODULE__{} = pm, %HouseholdCreated{household_id: household_id}) do
-    %__MODULE__{pm | household_id: household_id, membership_created: true}
+    %__MODULE__{pm | household_id: household_id}
   end
 end

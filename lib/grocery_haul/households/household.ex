@@ -103,7 +103,11 @@ defmodule GroceryHaul.Households.Household do
   def execute(%__MODULE__{created: false}, %DissolveHousehold{}), do: {:error, :not_found}
 
   def execute(%__MODULE__{members: members}, %DissolveHousehold{user_id: user_id})
-      when not is_map_key(members, user_id) or :erlang.map_get(user_id, members) != :admin,
+      when not is_map_key(members, user_id),
+      do: {:error, :not_admin}
+
+  def execute(%__MODULE__{members: members}, %DissolveHousehold{user_id: user_id})
+      when :erlang.map_get(user_id, members) != :admin,
       do: {:error, :not_admin}
 
   def execute(%__MODULE__{}, %DissolveHousehold{} = cmd) do

@@ -43,7 +43,12 @@ defmodule GroceryHaulWeb.HouseholdLive.Settings do
         <section class="mb-8">
           <h2 class="text-lg font-semibold mb-2">Rename Household</h2>
           <form id="rename-household-form" phx-submit="rename_household">
-            <input type="text" name="household[name]" value={@household.name} class="border rounded px-3 py-2 mr-2" />
+            <input
+              type="text"
+              name="household[name]"
+              value={@household.name}
+              class="border rounded px-3 py-2 mr-2"
+            />
             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Rename</button>
           </form>
         </section>
@@ -56,20 +61,36 @@ defmodule GroceryHaulWeb.HouseholdLive.Settings do
                 <span>{member.user_id}</span>
                 <span class="text-sm text-gray-500">{member.role}</span>
                 <%= if member.user_id != @current_user.id do %>
-                  <button phx-click="remove_member" phx-value-user_id={member.user_id} class="text-red-600 text-sm underline">
+                  <button
+                    phx-click="remove_member"
+                    phx-value-user_id={member.user_id}
+                    class="text-red-600 text-sm underline"
+                  >
                     Remove
                   </button>
                   <%= if member.role == :member do %>
-                    <button phx-click="promote_admin" phx-value-user_id={member.user_id} class="text-blue-600 text-sm underline">
+                    <button
+                      phx-click="promote_admin"
+                      phx-value-user_id={member.user_id}
+                      class="text-blue-600 text-sm underline"
+                    >
                       Promote to Admin
                     </button>
                   <% else %>
-                    <button phx-click="demote_admin" phx-value-user_id={member.user_id} class="text-orange-600 text-sm underline">
+                    <button
+                      phx-click="demote_admin"
+                      phx-value-user_id={member.user_id}
+                      class="text-orange-600 text-sm underline"
+                    >
                       Demote to Member
                     </button>
                   <% end %>
                 <% else %>
-                  <button phx-click="demote_admin" phx-value-user_id={member.user_id} class="text-orange-600 text-sm underline">
+                  <button
+                    phx-click="demote_admin"
+                    phx-value-user_id={member.user_id}
+                    class="text-orange-600 text-sm underline"
+                  >
                     Demote self
                   </button>
                 <% end %>

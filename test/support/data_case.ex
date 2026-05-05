@@ -41,7 +41,9 @@ defmodule GroceryHaul.DataCase do
   """
   def reset_event_store do
     event_store = Module.concat([GroceryHaul.Commanded.Application, EventStore])
-    aggregates_sup = Module.concat([GroceryHaul.Commanded.Application, Commanded.Aggregates.Supervisor])
+
+    aggregates_sup =
+      Module.concat([GroceryHaul.Commanded.Application, Commanded.Aggregates.Supervisor])
 
     :sys.replace_state(event_store, fn state ->
       %{state | streams: %{}, persisted_events: [], next_event_number: 1}

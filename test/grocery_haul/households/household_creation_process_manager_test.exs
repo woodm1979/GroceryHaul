@@ -37,14 +37,13 @@ defmodule GroceryHaul.Households.HouseholdCreationProcessManagerTest do
   end
 
   describe "apply/2" do
-    test "records membership_created state after HouseholdCreated" do
+    test "records household_id after HouseholdCreated" do
       pm = %HouseholdCreationProcessManager{}
       event = %HouseholdCreated{household_id: "hh-1", name: "Test", created_by: "u-1"}
 
       updated = HouseholdCreationProcessManager.apply(pm, event)
 
-      assert %HouseholdCreationProcessManager{household_id: "hh-1", membership_created: true} =
-               updated
+      assert %HouseholdCreationProcessManager{household_id: "hh-1"} = updated
     end
   end
 end
