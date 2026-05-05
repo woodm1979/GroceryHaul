@@ -28,7 +28,7 @@ defmodule GroceryHaul.Households.HouseholdAggregateTest do
   alias GroceryHaul.Households.Household
 
   describe "CreateHousehold" do
-    test "successful creation emits HouseholdCreated and JoinCodeGenerated" do
+    test "successful creation emits HouseholdCreated, JoinCodeGenerated, and MemberJoined" do
       household = %Household{}
 
       cmd = %CreateHousehold{
@@ -45,7 +45,12 @@ defmodule GroceryHaul.Households.HouseholdAggregateTest do
                  name: "The Smith Family",
                  created_by: "user-uuid-1"
                },
-               %JoinCodeGenerated{household_id: "hh-uuid-1", code: code}
+               %JoinCodeGenerated{household_id: "hh-uuid-1", code: code},
+               %MemberJoined{
+                 household_id: "hh-uuid-1",
+                 user_id: "user-uuid-1",
+                 role: :admin
+               }
              ] = events
 
       assert is_binary(code)

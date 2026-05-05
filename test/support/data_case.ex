@@ -34,14 +34,33 @@ defmodule GroceryHaul.DataCase do
   end
 
   # Projector processes are intentionally left running — only aggregate state is flushed.
+  # Subscription checkpoints must also be reset so projectors see new events after the
+  # event store is cleared (InMemory uses global event numbers; stale checkpoints cause
+  # new events to be silently skipped).
+  # last_seen_event in each handler must be reset to nil: if left set, new events whose
+  # event_number <= last_seen_event are silently skipped as "already seen" after reset.
   def reset_event_store do
     event_store = Module.concat([GroceryHaul.Commanded.Application, EventStore])
+    registry = Module.concat([GroceryHaul.Commanded.Application, LocalRegistry])
 
     aggregates_sup =
       Module.concat([GroceryHaul.Commanded.Application, Commanded.Aggregates.Supervisor])
 
     :sys.replace_state(event_store, fn state ->
-      %{state | streams: %{}, persisted_events: [], next_event_number: 1}
+      reset_subs = Map.new(state.persistent_subscriptions, &reset_sub/1)
+
+      %{
+        state
+        | streams: %{},
+          persisted_events: [],
+          next_event_number: 1,
+          persistent_subscriptions: reset_subs
+      }
+    end)
+
+    Registry.select(registry, [{{{:_, Commanded.Event.Handler, :_}, :"$1", :_}, [], [:"$1"]}])
+    |> Enum.each(fn pid ->
+      :sys.replace_state(pid, fn state -> %{state | last_seen_event: nil} end)
     end)
 
     for {_, pid, _, _} <- DynamicSupervisor.which_children(aggregates_sup) do
@@ -49,6 +68,15 @@ defmodule GroceryHaul.DataCase do
     end
   rescue
     _ -> :ok
+  catch
+    :exit, _ -> :ok
+  end
+
+  defp reset_sub({name, sub}) do
+    reset_subscribers =
+      Enum.map(sub.subscribers, &%{&1 | in_flight_events: [], pending_events: []})
+
+    {name, %{sub | checkpoint: 0, subscribers: reset_subscribers}}
   end
 
   @doc """
