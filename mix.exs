@@ -106,6 +106,7 @@ defmodule GroceryHaul.MixProject do
         "phx.digest"
       ],
       "event_store.reset": ["event_store.drop", "event_store.create", "event_store.init"],
+      "db.reset": ["ecto.reset", "event_store.reset"],
       precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
     ]
   end

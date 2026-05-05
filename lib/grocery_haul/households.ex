@@ -3,30 +3,32 @@ defmodule GroceryHaul.Households do
   import Ecto.Query
 
   alias GroceryHaul.Commanded.Application, as: App
-  alias GroceryHaul.Households.Commands.{CreateHousehold, GenerateJoinCode, JoinHousehold}
+
+  alias GroceryHaul.Households.Commands.{
+    CreateHousehold,
+    DemoteAdmin,
+    DissolveHousehold,
+    GenerateJoinCode,
+    JoinHousehold,
+    LeaveHousehold,
+    PromoteAdmin,
+    RemoveMember,
+    RenameHousehold
+  }
+
   alias GroceryHaul.Households.{HouseholdMembersProjection, HouseholdProjection, JoinCodeIndex}
   alias GroceryHaul.Repo
 
-  @doc "Creates a household and auto-joins the creator as admin."
+  @doc "Creates a household and auto-joins the creator as admin (via process manager)."
   def create_household(user_id, name) do
     household_id = Ecto.UUID.generate()
 
-    with :ok <-
-           App.dispatch(
-             %CreateHousehold{household_id: household_id, name: name, created_by: user_id},
-             consistency: :strong
-           ),
-         :ok <-
-           App.dispatch(
-             %JoinHousehold{
-               membership_id: "#{household_id}:#{user_id}",
-               household_id: household_id,
-               user_id: user_id,
-               role: :admin
-             },
-             consistency: :strong
-           ) do
-      {:ok, household_id}
+    case App.dispatch(
+           %CreateHousehold{household_id: household_id, name: name, created_by: user_id},
+           consistency: :strong
+         ) do
+      :ok -> {:ok, household_id}
+      error -> error
     end
   end
 
@@ -54,7 +56,6 @@ defmodule GroceryHaul.Households do
       %JoinCodeIndex{household_id: household_id} ->
         case App.dispatch(
                %JoinHousehold{
-                 membership_id: "#{household_id}:#{user_id}",
                  household_id: household_id,
                  user_id: user_id,
                  role: :member
@@ -84,5 +85,63 @@ defmodule GroceryHaul.Households do
         on: h.id == m.household_id,
         select: h
     )
+  end
+
+  @doc "Renames a household."
+  def rename_household(household_id, name) do
+    App.dispatch(%RenameHousehold{household_id: household_id, name: name}, consistency: :strong)
+  end
+
+  @doc "A member leaves a household."
+  def leave_household(household_id, user_id) do
+    App.dispatch(
+      %LeaveHousehold{household_id: household_id, user_id: user_id},
+      consistency: :strong
+    )
+  end
+
+  @doc "Admin removes a member from a household."
+  def remove_member(household_id, user_id) do
+    App.dispatch(
+      %RemoveMember{household_id: household_id, user_id: user_id},
+      consistency: :strong
+    )
+  end
+
+  @doc "Promotes a member to admin. Returns {:error, :not_member} if user is not in the household."
+  def promote_admin(household_id, user_id) do
+    App.dispatch(
+      %PromoteAdmin{household_id: household_id, user_id: user_id},
+      consistency: :strong
+    )
+  end
+
+  @doc """
+  Demotes an admin to member. Returns {:error, :sole_admin} if user is the only admin.
+  """
+  def demote_admin(household_id, user_id) do
+    App.dispatch(
+      %DemoteAdmin{household_id: household_id, user_id: user_id},
+      consistency: :strong
+    )
+  end
+
+  @doc "Dissolves a household. Only an admin may dissolve. Returns :ok or {:error, reason}."
+  def dissolve_household(household_id, user_id) do
+    App.dispatch(
+      %DissolveHousehold{household_id: household_id, user_id: user_id},
+      consistency: :strong
+    )
+  end
+
+  @doc "Returns the role of a user in a household, or nil."
+  def get_member_role(household_id, user_id) do
+    case Repo.one(
+           from m in HouseholdMembersProjection,
+             where: m.household_id == ^household_id and m.user_id == ^user_id
+         ) do
+      nil -> nil
+      m -> m.role
+    end
   end
 end

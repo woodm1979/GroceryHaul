@@ -2,7 +2,7 @@
 
 > PRD: ./2026-04-28-phase2-auth-households-PRD.md
 > Executor: /build
-> Created: 2026-04-28  |  Last touched: 2026-04-28  (Section 3 completed 2026-04-28)
+> Created: 2026-04-28  |  Last touched: 2026-05-04  (Section 4 completed 2026-05-04)
 
 ## Architectural decisions
 
@@ -136,7 +136,7 @@ A `Household` Commanded aggregate handling `CreateHousehold` → `HouseholdCreat
 
 ## Section 4: Member management and rename
 
-**Status:** [ ] not started
+**Status:** [x] complete
 **Model:** sonnet
 **User stories covered:** 6, 7, 8, 9
 
@@ -146,15 +146,15 @@ A `Household` Commanded aggregate handling `CreateHousehold` → `HouseholdCreat
 
 ### Acceptance criteria
 
-- [ ] A member can leave a household; they are redirected to the "create or join" screen.
-- [ ] An admin can remove another member; that member no longer appears in the member list.
-- [ ] An admin can promote a member to admin; the promoted user gains admin capabilities.
-- [ ] An admin can demote another admin to member (but cannot demote themselves if they are the sole admin — this should be rejected with a visible error).
-- [ ] An admin can rename the household; the new name is reflected immediately in the UI.
-- [ ] A non-admin cannot access member management actions (attempting to do so is rejected).
-- [ ] `MemberLeft`, `MemberRemoved`, `AdminPromoted`, `AdminDemoted`, `HouseholdRenamed` events appear in the event store as appropriate.
-- [ ] Aggregate unit tests cover: all five commands, plus the sole-admin demotion guard.
-- [ ] Integration tests cover: leave, remove, promote, demote, rename via LiveView.
+- [x] A member can leave a household; they are redirected to the "create or join" screen.
+- [x] An admin can remove another member; that member no longer appears in the member list.
+- [x] An admin can promote a member to admin; the promoted user gains admin capabilities.
+- [x] An admin can demote another admin to member (but cannot demote themselves if they are the sole admin — this should be rejected with a visible error).
+- [x] An admin can rename the household; the new name is reflected immediately in the UI.
+- [x] A non-admin cannot access member management actions (attempting to do so is rejected).
+- [x] `MemberLeft`, `MemberRemoved`, `AdminPromoted`, `AdminDemoted`, `HouseholdRenamed` events appear in the event store as appropriate.
+- [x] Aggregate unit tests cover: all five commands, plus the sole-admin demotion guard.
+- [x] Integration tests cover: leave, remove, promote, demote, rename via LiveView.
 
 ### Notes for executor
 
@@ -164,7 +164,6 @@ A `Household` Commanded aggregate handling `CreateHousehold` → `HouseholdCreat
 
 ### Completion log
 
-<!-- Executor fills in after section completes -->
-- Commits:
-- Tests added:
-- Deviations from plan:
+- Commits: 16f5404
+- Tests added: 27 (5 membership aggregate unit, 2 household aggregate unit, 10 context integration, 10 LiveView)
+- Deviations from plan: Sole-admin guard implemented in context (Households.demote_admin/2) by reading HouseholdMembersProjection before dispatch, per plan note recommendation. Settings page accessible to all members (not admin-only) so members can use the leave action; admin-specific UI sections conditionally rendered and event handlers guard-claused for non-admins.

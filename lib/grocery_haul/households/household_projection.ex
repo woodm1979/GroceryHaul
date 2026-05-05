@@ -5,6 +5,7 @@ defmodule GroceryHaul.Households.HouseholdProjection do
   @foreign_key_type :binary_id
   schema "household_projections" do
     field :name, :string
+    field :dissolved_at, :utc_datetime_usec
 
     timestamps(type: :utc_datetime)
   end

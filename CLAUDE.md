@@ -12,7 +12,12 @@ mix test path/to/test_file.exs:42  # run single test at line
 mix format            # format code
 mix credo             # lint
 mix dialyzer          # type-check (slow on first run)
+mix dev.db_startup    # open Docker Desktop and start the dev database via docker compose
 ```
+
+## Database troubleshooting
+
+If tests fail with database connection errors (e.g. `DBConnection.ConnectionError`, `Postgrex.Error`, "connection refused", or event store connection failures), run `mix dev.db_startup` to open Docker Desktop and start the database before retrying.
 
 ## Setup after cloning
 

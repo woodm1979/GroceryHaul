@@ -6,7 +6,16 @@ defmodule GroceryHaul.Households.HouseholdMembersProjector do
     consistency: :strong,
     start_from: :current
 
-  alias GroceryHaul.Households.Events.MemberJoined
+  import Ecto.Query
+
+  alias GroceryHaul.Households.Events.{
+    AdminDemoted,
+    AdminPromoted,
+    MemberJoined,
+    MemberLeft,
+    MemberRemoved
+  }
+
   alias GroceryHaul.Households.HouseholdMembersProjection
   alias GroceryHaul.Repo
 
@@ -24,5 +33,39 @@ defmodule GroceryHaul.Households.HouseholdMembersProjector do
       {:ok, _} -> :ok
       {:error, changeset} -> {:error, changeset}
     end
+  end
+
+  def handle(%MemberLeft{} = event, _metadata), do: delete_member(event)
+  def handle(%MemberRemoved{} = event, _metadata), do: delete_member(event)
+
+  def handle(%AdminPromoted{} = event, _metadata) do
+    Repo.update_all(
+      from(m in HouseholdMembersProjection,
+        where: m.household_id == ^event.household_id and m.user_id == ^event.user_id
+      ),
+      set: [role: :admin]
+    )
+
+    :ok
+  end
+
+  def handle(%AdminDemoted{} = event, _metadata) do
+    Repo.update_all(
+      from(m in HouseholdMembersProjection,
+        where: m.household_id == ^event.household_id and m.user_id == ^event.user_id
+      ),
+      set: [role: :member]
+    )
+
+    :ok
+  end
+
+  defp delete_member(event) do
+    Repo.delete_all(
+      from m in HouseholdMembersProjection,
+        where: m.household_id == ^event.household_id and m.user_id == ^event.user_id
+    )
+
+    :ok
   end
 end

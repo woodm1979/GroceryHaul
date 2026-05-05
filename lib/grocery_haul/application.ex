@@ -9,6 +9,7 @@ defmodule GroceryHaul.Application do
       GroceryHaulWeb.Telemetry,
       GroceryHaul.Repo,
       GroceryHaul.Commanded.Application,
+      GroceryHaul.Households.HouseholdCreationProcessManager,
       GroceryHaul.Accounts.UserProjector,
       GroceryHaul.Households.HouseholdProjector,
       GroceryHaul.Households.HouseholdMembersProjector,

@@ -6,7 +6,9 @@ defmodule GroceryHaul.Households.HouseholdProjector do
     consistency: :strong,
     start_from: :current
 
-  alias GroceryHaul.Households.Events.HouseholdCreated
+  import Ecto.Query
+
+  alias GroceryHaul.Households.Events.{HouseholdCreated, HouseholdDissolved, HouseholdRenamed}
   alias GroceryHaul.Households.HouseholdProjection
   alias GroceryHaul.Repo
 
@@ -21,5 +23,30 @@ defmodule GroceryHaul.Households.HouseholdProjector do
       {:ok, _} -> :ok
       {:error, changeset} -> {:error, changeset}
     end
+  end
+
+  def handle(%HouseholdRenamed{} = event, _metadata) do
+    case Repo.get(HouseholdProjection, event.household_id) do
+      nil ->
+        :ok
+
+      projection ->
+        projection
+        |> Ecto.Changeset.change(%{name: event.name})
+        |> Repo.update()
+        |> case do
+          {:ok, _} -> :ok
+          {:error, changeset} -> {:error, changeset}
+        end
+    end
+  end
+
+  def handle(%HouseholdDissolved{} = event, _metadata) do
+    Repo.update_all(
+      from(h in HouseholdProjection, where: h.id == ^event.household_id),
+      set: [dissolved_at: event.dissolved_at]
+    )
+
+    :ok
   end
 end
