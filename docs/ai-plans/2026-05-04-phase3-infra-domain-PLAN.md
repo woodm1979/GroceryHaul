@@ -3,7 +3,7 @@
 > PRD: ./2026-05-04-phase3-infra-domain-PRD.md
 > Executor: /build
 > Worktree: /Users/woodnt/Code/src/github.com/woodm1979/GroceryHaul-worktrees/phase3-infra-domain
-> Created: 2026-05-04  |  Last touched: 2026-05-04
+> Created: 2026-05-04  |  Last touched: 2026-05-05
 
 ## Architectural decisions
 
@@ -92,7 +92,7 @@ Add a `dialyzer` job to `.github/workflows/ci.yml` with PLT caching so dialyzer 
 
 ## Section 3: `mix db.reset` alias
 
-**Status:** [ ] not started
+**Status:** [x] complete
 **Model:** haiku
 **User stories covered:** 3
 
@@ -102,9 +102,9 @@ Add a `db.reset` alias to `mix.exs` that resets both the Ecto database and the E
 
 ### Acceptance criteria
 
-- [ ] `mix db.reset` runs without error on a clean dev environment.
-- [ ] Running `mix db.reset` drops and recreates both the Ecto DB and the EventStore.
-- [ ] The alias is defined in `mix.exs` under `defp aliases`.
+- [x] `mix db.reset` runs without error on a clean dev environment.
+- [x] Running `mix db.reset` drops and recreates both the Ecto DB and the EventStore.
+- [x] The alias is defined in `mix.exs` under `defp aliases`.
 
 ### Notes for executor
 
@@ -115,10 +115,9 @@ Add a `db.reset` alias to `mix.exs` that resets both the Ecto database and the E
 
 ### Completion log
 
-<!-- Executor fills in after section completes -->
-- Commits:
-- Tests added:
-- Deviations from plan:
+- Commits: f48c12b
+- Tests added: 1
+- Deviations from plan: none
 
 ---
 
