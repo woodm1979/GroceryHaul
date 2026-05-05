@@ -38,6 +38,11 @@ defmodule GroceryHaul.Households.Household do
       %JoinCodeGenerated{
         household_id: cmd.household_id,
         code: generate_code()
+      },
+      %MemberJoined{
+        household_id: cmd.household_id,
+        user_id: cmd.created_by,
+        role: :admin
       }
     ]
   end

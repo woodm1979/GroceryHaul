@@ -2,6 +2,8 @@ defmodule Mix.Tasks.Dev.DbStartup do
   @shortdoc "Opens Docker Desktop and starts the dev database via docker compose"
   use Mix.Task
 
+  @moduledoc false
+
   @impl Mix.Task
   def run(_args) do
     Mix.shell().info("Starting Docker and database...")
