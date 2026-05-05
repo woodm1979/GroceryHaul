@@ -56,6 +56,13 @@ defmodule GroceryHaulWeb.HouseholdLive.Show do
           <li>{member.user_id} — {member.role}</li>
         <% end %>
       </ul>
+
+      <%= if @my_role == :admin do %>
+        <.link navigate={~p"/households/#{@household.id}/settings"} class="mt-4 inline-block text-blue-600 underline">
+          Settings
+        </.link>
+      <% end %>
+
       <.link href={~p"/logout"} method="delete" class="mt-6 inline-block text-red-600">
         Log out
       </.link>

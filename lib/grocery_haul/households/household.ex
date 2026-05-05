@@ -2,8 +2,8 @@ defmodule GroceryHaul.Households.Household do
   @moduledoc false
   defstruct created: false
 
-  alias GroceryHaul.Households.Commands.{CreateHousehold, GenerateJoinCode}
-  alias GroceryHaul.Households.Events.{HouseholdCreated, JoinCodeGenerated}
+  alias GroceryHaul.Households.Commands.{CreateHousehold, GenerateJoinCode, RenameHousehold}
+  alias GroceryHaul.Households.Events.{HouseholdCreated, HouseholdRenamed, JoinCodeGenerated}
 
   def execute(%__MODULE__{created: true}, %CreateHousehold{}), do: {:error, :already_created}
 
@@ -27,11 +27,21 @@ defmodule GroceryHaul.Households.Household do
     [%JoinCodeGenerated{household_id: cmd.household_id, code: generate_code()}]
   end
 
+  def execute(%__MODULE__{created: false}, %RenameHousehold{}), do: {:error, :not_found}
+
+  def execute(%__MODULE__{created: true}, %RenameHousehold{} = cmd) do
+    [%HouseholdRenamed{household_id: cmd.household_id, name: cmd.name}]
+  end
+
   def apply(%__MODULE__{} = household, %HouseholdCreated{}) do
     %{household | created: true}
   end
 
   def apply(%__MODULE__{} = household, %JoinCodeGenerated{}) do
+    household
+  end
+
+  def apply(%__MODULE__{} = household, %HouseholdRenamed{}) do
     household
   end
 

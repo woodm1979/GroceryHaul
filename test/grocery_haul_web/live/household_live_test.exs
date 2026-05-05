@@ -137,5 +137,135 @@ defmodule GroceryHaulWeb.HouseholdLiveTest do
       assert new_entry.code != old_code
       assert html =~ new_entry.code
     end
+
+    test "admin sees link to settings page", %{conn: conn, household_id: household_id} do
+      {:ok, _view, html} = live(conn, ~p"/households/#{household_id}")
+      assert html =~ "/households/#{household_id}/settings"
+    end
+  end
+
+  describe "household settings page" do
+    setup %{conn: conn} do
+      {conn, creator_id, creator} = register_and_login(conn, "settings_admin@example.com")
+      {:ok, household_id} = Households.create_household(creator_id, "Settings Family")
+      %{conn: conn, creator_id: creator_id, creator: creator, household_id: household_id}
+    end
+
+    test "admin can access settings page", %{conn: conn, household_id: household_id} do
+      {:ok, _view, html} = live(conn, ~p"/households/#{household_id}/settings")
+      assert html =~ "Settings Family"
+    end
+
+    test "admin can rename the household", %{conn: conn, household_id: household_id} do
+      {:ok, view, _html} = live(conn, ~p"/households/#{household_id}/settings")
+
+      html =
+        view
+        |> form("#rename-household-form", household: %{name: "Renamed Family"})
+        |> render_submit()
+
+      assert html =~ "Renamed Family"
+    end
+
+    test "admin can remove a member", %{
+      conn: conn,
+      household_id: household_id,
+      creator_id: creator_id
+    } do
+      # Add a second user
+      joiner_id = Ecto.UUID.generate()
+      %{code: code} = Households.get_join_code(household_id)
+      {:ok, _} = Households.join_via_code(joiner_id, code)
+
+      {:ok, view, _html} = live(conn, ~p"/households/#{household_id}/settings")
+      assert render(view) =~ joiner_id
+
+      html =
+        view
+        |> element("[phx-click=\"remove_member\"][phx-value-user_id=\"#{joiner_id}\"]")
+        |> render_click()
+
+      refute html =~ joiner_id
+      members = Households.list_members(household_id)
+      assert length(members) == 1
+      assert hd(members).user_id == creator_id
+    end
+
+    test "admin can promote a member to admin", %{conn: conn, household_id: household_id} do
+      joiner_id = Ecto.UUID.generate()
+      %{code: code} = Households.get_join_code(household_id)
+      {:ok, _} = Households.join_via_code(joiner_id, code)
+
+      {:ok, view, _html} = live(conn, ~p"/households/#{household_id}/settings")
+
+      view
+      |> element("[phx-click=\"promote_admin\"][phx-value-user_id=\"#{joiner_id}\"]")
+      |> render_click()
+
+      assert Households.get_member_role(household_id, joiner_id) == :admin
+    end
+
+    test "admin can demote another admin to member", %{conn: conn, household_id: household_id} do
+      joiner_id = Ecto.UUID.generate()
+      %{code: code} = Households.get_join_code(household_id)
+      {:ok, _} = Households.join_via_code(joiner_id, code)
+      :ok = Households.promote_admin(household_id, joiner_id)
+
+      {:ok, view, _html} = live(conn, ~p"/households/#{household_id}/settings")
+
+      view
+      |> element("[phx-click=\"demote_admin\"][phx-value-user_id=\"#{joiner_id}\"]")
+      |> render_click()
+
+      assert Households.get_member_role(household_id, joiner_id) == :member
+    end
+
+    test "admin cannot demote themselves if sole admin", %{
+      conn: conn,
+      household_id: household_id,
+      creator_id: creator_id
+    } do
+      {:ok, view, _html} = live(conn, ~p"/households/#{household_id}/settings")
+
+      html =
+        view
+        |> element("[phx-click=\"demote_admin\"][phx-value-user_id=\"#{creator_id}\"]")
+        |> render_click()
+
+      assert html =~ "sole admin"
+    end
+
+    test "non-admin cannot access settings page", %{conn: conn, household_id: household_id} do
+      # Register a second user as a member and try to access settings
+      joiner_id = Ecto.UUID.generate()
+      %{code: code} = Households.get_join_code(household_id)
+      {:ok, _} = Households.join_via_code(joiner_id, code)
+
+      {conn2, _uid, _u} = register_and_login(conn, "non_admin_settings@example.com")
+      # This user is not even in this household
+      {:error, {:redirect, %{to: to}}} =
+        live(conn2, ~p"/households/#{household_id}/settings")
+
+      assert to == "/households/new"
+    end
+
+    test "member can leave the household and is redirected", %{
+      conn: conn,
+      household_id: household_id
+    } do
+      # Register a member user
+      {conn2, user_id2, _u} = register_and_login(conn, "leaver_settings@example.com")
+      %{code: code} = Households.get_join_code(household_id)
+      {:ok, _} = Households.join_via_code(user_id2, code)
+
+      {:ok, view, _html} = live(conn2, ~p"/households/#{household_id}/settings")
+
+      {:error, {:redirect, %{to: to}}} =
+        view
+        |> element("[phx-click=\"leave_household\"]")
+        |> render_click()
+
+      assert to == "/households/new"
+    end
   end
 end

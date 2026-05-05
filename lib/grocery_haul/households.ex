@@ -3,7 +3,18 @@ defmodule GroceryHaul.Households do
   import Ecto.Query
 
   alias GroceryHaul.Commanded.Application, as: App
-  alias GroceryHaul.Households.Commands.{CreateHousehold, GenerateJoinCode, JoinHousehold}
+
+  alias GroceryHaul.Households.Commands.{
+    CreateHousehold,
+    DemoteAdmin,
+    GenerateJoinCode,
+    JoinHousehold,
+    LeaveHousehold,
+    PromoteAdmin,
+    RemoveMember,
+    RenameHousehold
+  }
+
   alias GroceryHaul.Households.{HouseholdMembersProjection, HouseholdProjection, JoinCodeIndex}
   alias GroceryHaul.Repo
 
@@ -84,5 +95,83 @@ defmodule GroceryHaul.Households do
         on: h.id == m.household_id,
         select: h
     )
+  end
+
+  @doc "Renames a household."
+  def rename_household(household_id, name) do
+    App.dispatch(%RenameHousehold{household_id: household_id, name: name}, consistency: :strong)
+  end
+
+  @doc "A member leaves a household."
+  def leave_household(household_id, user_id) do
+    App.dispatch(
+      %LeaveHousehold{
+        membership_id: "#{household_id}:#{user_id}",
+        household_id: household_id,
+        user_id: user_id
+      },
+      consistency: :strong
+    )
+  end
+
+  @doc "Admin removes a member from a household."
+  def remove_member(household_id, user_id) do
+    App.dispatch(
+      %RemoveMember{
+        membership_id: "#{household_id}:#{user_id}",
+        household_id: household_id,
+        user_id: user_id
+      },
+      consistency: :strong
+    )
+  end
+
+  @doc "Promotes a member to admin. Returns {:error, :not_member} if user is not in the household."
+  def promote_admin(household_id, user_id) do
+    App.dispatch(
+      %PromoteAdmin{
+        membership_id: "#{household_id}:#{user_id}",
+        household_id: household_id,
+        user_id: user_id
+      },
+      consistency: :strong
+    )
+  end
+
+  @doc """
+  Demotes an admin to member. Returns {:error, :sole_admin} if user is the only admin.
+  """
+  def demote_admin(household_id, user_id) do
+    admin_count =
+      Repo.aggregate(
+        from(m in HouseholdMembersProjection,
+          where: m.household_id == ^household_id and m.role == :admin
+        ),
+        :count
+      )
+
+    if admin_count <= 1 do
+      {:error, :sole_admin}
+    else
+      App.dispatch(
+        %DemoteAdmin{
+          membership_id: "#{household_id}:#{user_id}",
+          household_id: household_id,
+          user_id: user_id
+        },
+        consistency: :strong
+      )
+    end
+  end
+
+  @doc "Returns the role of a user in a household, or nil."
+  def get_member_role(household_id, user_id) do
+    case Repo.one(
+           from m in HouseholdMembersProjection,
+             where: m.household_id == ^household_id and m.user_id == ^user_id
+         ) do
+      nil -> nil
+      m -> m.role
+    end
   end
 end
