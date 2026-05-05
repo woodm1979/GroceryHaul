@@ -3,7 +3,7 @@
 > PRD: ./2026-05-04-phase3-infra-domain-PRD.md
 > Executor: /build
 > Worktree: /Users/woodnt/Code/src/github.com/woodm1979/GroceryHaul-worktrees/phase3-infra-domain
-> Created: 2026-05-04  |  Last touched: 2026-05-04
+> Created: 2026-05-04  |  Last touched: 2026-05-05
 
 ## Architectural decisions
 
@@ -28,7 +28,7 @@
 
 ## Section 1: EventStore test isolation
 
-**Status:** [ ] not started
+**Status:** [x] complete
 **Model:** haiku
 **User stories covered:** 1
 
@@ -38,9 +38,9 @@ Add `GroceryHaul.EventStore.reset!()` to the `DataCase` setup callback so EventS
 
 ### Acceptance criteria
 
-- [ ] A test that writes an event to a stream, then a subsequent test that reads the same stream, finds no events.
-- [ ] All existing tests continue to pass with the reset in place.
-- [ ] `DataCase` calls `GroceryHaul.EventStore.reset!()` in its `setup` block (or equivalent teardown).
+- [x] A test that writes an event to a stream, then a subsequent test that reads the same stream, finds no events.
+- [x] All existing tests continue to pass with the reset in place.
+- [x] `DataCase` calls `GroceryHaul.EventStore.reset!()` in its `setup` block (or equivalent teardown).
 
 ### Notes for executor
 
@@ -51,10 +51,9 @@ Add `GroceryHaul.EventStore.reset!()` to the `DataCase` setup callback so EventS
 
 ### Completion log
 
-<!-- Executor fills in after section completes -->
-- Commits:
-- Tests added:
-- Deviations from plan:
+- Commits: f21d83140ce3e359a3efb492babf2fe6c116271b
+- Tests added: 2
+- Deviations from plan: Test env uses InMemory adapter (not real EventStore), so reset is implemented as `:sys.replace_state` on the InMemory GenServer + stopping aggregate processes, wrapped in `DataCase.reset_event_store/0`. `GroceryHaul.EventStore.reset!()` literal not used (real EventStore not started in tests).
 
 ---
 
