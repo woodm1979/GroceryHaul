@@ -65,3 +65,13 @@ Prior-art: existing aggregate tests under `test/grocery_haul/households/`, `Data
 
 - [ ] Should `DissolveHousehold` soft-delete (mark dissolved in projection) or hard-delete (remove projection rows)? Soft-delete assumed; revisit if storage becomes a concern.
 - [ ] `HouseholdMembership` aggregate: delete module entirely, or keep as dead code until the branch is merged and verified? Delete assumed.
+
+## Future Considerations
+
+- **Hard-delete for dissolved households**: the current soft-delete approach leaves dissolved households in the projection indefinitely. If storage grows, a background job or admin command to purge projection rows for dissolved households would be needed.
+- **`reset_event_store/0` brittleness**: the InMemory adapter's internal state map keys (`streams`, `persisted_events`, `next_event_number`) are private implementation details of Commanded. A library version bump could silently break test isolation. Track the upstream API for an official `reset!/0` call and migrate when available.
+- **Integration test FK race condition**: 16–19 integration tests in `households_test.exs` fail due to a projector ordering race in the Ecto sandbox (JoinCodeProjector commits before HouseholdProjector, violating FK). This is pre-existing, not introduced here, but will block a clean `mix test` run — worth a dedicated fix before the next phase.
+- **Sole-admin guard on `LeaveHousehold`**: a sole admin can currently leave a household, leaving it admin-less. The same guard pattern used for `DemoteAdmin` should be applied to `LeaveHousehold` (and possibly `RemoveMember` when the target is the last admin).
+- **`DissolveHousehold` cascading state**: once a household is dissolved, member commands (`JoinHousehold`, `LeaveHousehold`, etc.) will still succeed because the aggregate has no `dissolved` flag. Adding a `dissolved: boolean` to `Household` state and guarding all commands against it would prevent post-dissolution mutations.
+- **Dialyzer PLT warm-up time in CI**: the first CI run after a `mix.lock` change will rebuild the PLT from scratch, which can take several minutes. Pre-seeding the PLT in a separate scheduled job or using a broader cache restore key would reduce cold-start pain.
+- **Process manager persistence in production**: `HouseholdCreationProcessManager` uses the in-memory Commanded backend in tests, but in production it needs a persistent store (Postgres event store) for crash recovery. Verify that the process manager state is correctly serialized and recovered after a node restart before first production deploy.
