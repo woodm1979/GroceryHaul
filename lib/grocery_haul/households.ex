@@ -7,6 +7,7 @@ defmodule GroceryHaul.Households do
   alias GroceryHaul.Households.Commands.{
     CreateHousehold,
     DemoteAdmin,
+    DissolveHousehold,
     GenerateJoinCode,
     JoinHousehold,
     LeaveHousehold,
@@ -121,6 +122,14 @@ defmodule GroceryHaul.Households do
   def demote_admin(household_id, user_id) do
     App.dispatch(
       %DemoteAdmin{household_id: household_id, user_id: user_id},
+      consistency: :strong
+    )
+  end
+
+  @doc "Dissolves a household. Only an admin may dissolve. Returns :ok or {:error, reason}."
+  def dissolve_household(household_id, user_id) do
+    App.dispatch(
+      %DissolveHousehold{household_id: household_id, user_id: user_id},
       consistency: :strong
     )
   end

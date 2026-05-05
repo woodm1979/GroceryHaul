@@ -5,6 +5,7 @@ defmodule GroceryHaul.Households.Household do
   alias GroceryHaul.Households.Commands.{
     CreateHousehold,
     DemoteAdmin,
+    DissolveHousehold,
     GenerateJoinCode,
     JoinHousehold,
     LeaveHousehold,
@@ -17,6 +18,7 @@ defmodule GroceryHaul.Households.Household do
     AdminDemoted,
     AdminPromoted,
     HouseholdCreated,
+    HouseholdDissolved,
     HouseholdRenamed,
     JoinCodeGenerated,
     MemberJoined,
@@ -98,6 +100,16 @@ defmodule GroceryHaul.Households.Household do
     end
   end
 
+  def execute(%__MODULE__{created: false}, %DissolveHousehold{}), do: {:error, :not_found}
+
+  def execute(%__MODULE__{members: members}, %DissolveHousehold{user_id: user_id})
+      when not is_map_key(members, user_id) or :erlang.map_get(user_id, members) != :admin,
+      do: {:error, :not_admin}
+
+  def execute(%__MODULE__{}, %DissolveHousehold{} = cmd) do
+    [%HouseholdDissolved{household_id: cmd.household_id, dissolved_at: DateTime.utc_now()}]
+  end
+
   def apply(%__MODULE__{} = household, %HouseholdCreated{}) do
     %{household | created: true}
   end
@@ -128,6 +140,10 @@ defmodule GroceryHaul.Households.Household do
 
   def apply(%__MODULE__{members: members} = household, %AdminDemoted{} = event) do
     %{household | members: Map.put(members, event.user_id, :member)}
+  end
+
+  def apply(%__MODULE__{} = household, %HouseholdDissolved{}) do
+    household
   end
 
   defp generate_code do

@@ -229,4 +229,34 @@ defmodule GroceryHaul.HouseholdsTest do
       assert {:error, :sole_admin} = Households.demote_admin(household_id, creator_id)
     end
   end
+
+  describe "dissolve_household/2" do
+    test "admin can dissolve a household; dissolved_at is set" do
+      creator_id = Ecto.UUID.generate()
+      {:ok, household_id} = Households.create_household(creator_id, "Dissolve Test")
+
+      assert :ok = Households.dissolve_household(household_id, creator_id)
+
+      household = Households.get_household(household_id)
+      assert household.dissolved_at != nil
+    end
+
+    test "non-admin cannot dissolve a household" do
+      creator_id = Ecto.UUID.generate()
+      joiner_id = Ecto.UUID.generate()
+      {:ok, household_id} = Households.create_household(creator_id, "Dissolve Non-Admin")
+      %{code: code} = Households.get_join_code(household_id)
+      {:ok, _} = Households.join_via_code(joiner_id, code)
+
+      assert {:error, :not_admin} = Households.dissolve_household(household_id, joiner_id)
+    end
+
+    test "dissolved_at is nil before dissolution" do
+      creator_id = Ecto.UUID.generate()
+      {:ok, household_id} = Households.create_household(creator_id, "Not Dissolved")
+
+      household = Households.get_household(household_id)
+      assert household.dissolved_at == nil
+    end
+  end
 end

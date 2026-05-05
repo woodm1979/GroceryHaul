@@ -4,6 +4,7 @@ defmodule GroceryHaul.Households.HouseholdAggregateTest do
   alias GroceryHaul.Households.Commands.{
     CreateHousehold,
     DemoteAdmin,
+    DissolveHousehold,
     GenerateJoinCode,
     JoinHousehold,
     LeaveHousehold,
@@ -16,6 +17,7 @@ defmodule GroceryHaul.Households.HouseholdAggregateTest do
     AdminDemoted,
     AdminPromoted,
     HouseholdCreated,
+    HouseholdDissolved,
     HouseholdRenamed,
     JoinCodeGenerated,
     MemberJoined,
@@ -240,6 +242,37 @@ defmodule GroceryHaul.Households.HouseholdAggregateTest do
       cmd = %DemoteAdmin{household_id: "hh-uuid-1", user_id: "user-uuid-2"}
 
       assert {:error, :not_member} = Household.execute(household, cmd)
+    end
+  end
+
+  describe "DissolveHousehold" do
+    test "admin can dissolve a household" do
+      household = %Household{created: true, members: %{"user-uuid-1" => :admin}}
+      cmd = %DissolveHousehold{household_id: "hh-uuid-1", user_id: "user-uuid-1"}
+
+      assert [%HouseholdDissolved{household_id: "hh-uuid-1"}] =
+               Household.execute(household, cmd)
+    end
+
+    test "non-admin member cannot dissolve household" do
+      household = %Household{created: true, members: %{"user-uuid-1" => :member}}
+      cmd = %DissolveHousehold{household_id: "hh-uuid-1", user_id: "user-uuid-1"}
+
+      assert {:error, :not_admin} = Household.execute(household, cmd)
+    end
+
+    test "non-member cannot dissolve household" do
+      household = %Household{created: true, members: %{"user-uuid-2" => :admin}}
+      cmd = %DissolveHousehold{household_id: "hh-uuid-1", user_id: "user-uuid-1"}
+
+      assert {:error, :not_admin} = Household.execute(household, cmd)
+    end
+
+    test "cannot dissolve non-existent household" do
+      household = %Household{created: false}
+      cmd = %DissolveHousehold{household_id: "hh-uuid-1", user_id: "user-uuid-1"}
+
+      assert {:error, :not_found} = Household.execute(household, cmd)
     end
   end
 

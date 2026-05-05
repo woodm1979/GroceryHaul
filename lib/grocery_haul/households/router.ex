@@ -4,6 +4,7 @@ defmodule GroceryHaul.Households.Router do
   alias GroceryHaul.Households.Commands.{
     CreateHousehold,
     DemoteAdmin,
+    DissolveHousehold,
     GenerateJoinCode,
     JoinHousehold,
     LeaveHousehold,
@@ -23,4 +24,5 @@ defmodule GroceryHaul.Households.Router do
   dispatch(RemoveMember, to: Household, identity: :household_id)
   dispatch(PromoteAdmin, to: Household, identity: :household_id)
   dispatch(DemoteAdmin, to: Household, identity: :household_id)
+  dispatch(DissolveHousehold, to: Household, identity: :household_id)
 end
