@@ -35,6 +35,7 @@ defmodule GroceryHaulWeb.Router do
     live "/dashboard", DashboardLive, :index
     live "/households/new", HouseholdLive.New, :new
     live "/households/:id", HouseholdLive.Show, :show
+    live "/households/:id/settings", HouseholdLive.Settings, :settings
   end
 
   # Other scopes may use custom stacks.

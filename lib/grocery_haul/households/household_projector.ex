@@ -6,7 +6,7 @@ defmodule GroceryHaul.Households.HouseholdProjector do
     consistency: :strong,
     start_from: :current
 
-  alias GroceryHaul.Households.Events.HouseholdCreated
+  alias GroceryHaul.Households.Events.{HouseholdCreated, HouseholdRenamed}
   alias GroceryHaul.Households.HouseholdProjection
   alias GroceryHaul.Repo
 
@@ -20,6 +20,22 @@ defmodule GroceryHaul.Households.HouseholdProjector do
     |> case do
       {:ok, _} -> :ok
       {:error, changeset} -> {:error, changeset}
+    end
+  end
+
+  def handle(%HouseholdRenamed{} = event, _metadata) do
+    case Repo.get(HouseholdProjection, event.household_id) do
+      nil ->
+        :ok
+
+      projection ->
+        projection
+        |> Ecto.Changeset.change(%{name: event.name})
+        |> Repo.update()
+        |> case do
+          {:ok, _} -> :ok
+          {:error, changeset} -> {:error, changeset}
+        end
     end
   end
 end

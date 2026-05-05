@@ -146,4 +146,87 @@ defmodule GroceryHaul.HouseholdsTest do
       assert length(members) == 2
     end
   end
+
+  describe "rename_household/2" do
+    test "updates household name" do
+      user_id = Ecto.UUID.generate()
+      {:ok, household_id} = Households.create_household(user_id, "Old Name")
+      :ok = Households.rename_household(household_id, "New Name")
+      household = Households.get_household(household_id)
+      assert household.name == "New Name"
+    end
+  end
+
+  describe "leave_household/2" do
+    test "member is removed from the projection after leaving" do
+      creator_id = Ecto.UUID.generate()
+      joiner_id = Ecto.UUID.generate()
+      {:ok, household_id} = Households.create_household(creator_id, "Leave Test")
+      %{code: code} = Households.get_join_code(household_id)
+      {:ok, _} = Households.join_via_code(joiner_id, code)
+
+      :ok = Households.leave_household(household_id, joiner_id)
+
+      members = Households.list_members(household_id)
+      assert length(members) == 1
+      refute Enum.any?(members, fn m -> m.user_id == joiner_id end)
+    end
+
+    test "cannot leave if not a member" do
+      user_id = Ecto.UUID.generate()
+      nonmember_id = Ecto.UUID.generate()
+      {:ok, household_id} = Households.create_household(user_id, "Leave Error Test")
+      assert {:error, :not_member} = Households.leave_household(household_id, nonmember_id)
+    end
+  end
+
+  describe "remove_member/2" do
+    test "admin removes a member from the projection" do
+      creator_id = Ecto.UUID.generate()
+      joiner_id = Ecto.UUID.generate()
+      {:ok, household_id} = Households.create_household(creator_id, "Remove Test")
+      %{code: code} = Households.get_join_code(household_id)
+      {:ok, _} = Households.join_via_code(joiner_id, code)
+
+      :ok = Households.remove_member(household_id, joiner_id)
+
+      members = Households.list_members(household_id)
+      refute Enum.any?(members, fn m -> m.user_id == joiner_id end)
+    end
+  end
+
+  describe "promote_admin/2" do
+    test "member is promoted to admin role in projection" do
+      creator_id = Ecto.UUID.generate()
+      joiner_id = Ecto.UUID.generate()
+      {:ok, household_id} = Households.create_household(creator_id, "Promote Test")
+      %{code: code} = Households.get_join_code(household_id)
+      {:ok, _} = Households.join_via_code(joiner_id, code)
+
+      :ok = Households.promote_admin(household_id, joiner_id)
+
+      assert Households.get_member_role(household_id, joiner_id) == :admin
+    end
+  end
+
+  describe "demote_admin/2" do
+    test "second admin can be demoted to member" do
+      creator_id = Ecto.UUID.generate()
+      joiner_id = Ecto.UUID.generate()
+      {:ok, household_id} = Households.create_household(creator_id, "Demote Test")
+      %{code: code} = Households.get_join_code(household_id)
+      {:ok, _} = Households.join_via_code(joiner_id, code)
+      :ok = Households.promote_admin(household_id, joiner_id)
+
+      :ok = Households.demote_admin(household_id, joiner_id)
+
+      assert Households.get_member_role(household_id, joiner_id) == :member
+    end
+
+    test "sole admin cannot be demoted" do
+      creator_id = Ecto.UUID.generate()
+      {:ok, household_id} = Households.create_household(creator_id, "Sole Admin Test")
+      assert {:error, :sole_admin} = Households.demote_admin(household_id, creator_id)
+    end
+  end
 end

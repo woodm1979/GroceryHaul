@@ -1,8 +1,8 @@
 defmodule GroceryHaul.Households.HouseholdAggregateTest do
   use ExUnit.Case, async: true
 
-  alias GroceryHaul.Households.Commands.{CreateHousehold, GenerateJoinCode}
-  alias GroceryHaul.Households.Events.{HouseholdCreated, JoinCodeGenerated}
+  alias GroceryHaul.Households.Commands.{CreateHousehold, GenerateJoinCode, RenameHousehold}
+  alias GroceryHaul.Households.Events.{HouseholdCreated, HouseholdRenamed, JoinCodeGenerated}
   alias GroceryHaul.Households.Household
 
   describe "CreateHousehold" do
@@ -75,6 +75,24 @@ defmodule GroceryHaul.Households.HouseholdAggregateTest do
       # With 8-char alphanumeric codes there are 36^8 possibilities;
       # collision probability is negligible
       refute code1 == code2
+    end
+  end
+
+  describe "RenameHousehold" do
+    test "renaming an existing household emits HouseholdRenamed" do
+      household = %Household{created: true}
+
+      cmd = %RenameHousehold{household_id: "hh-uuid-1", name: "New Name"}
+
+      assert [%HouseholdRenamed{household_id: "hh-uuid-1", name: "New Name"}] =
+               Household.execute(household, cmd)
+    end
+
+    test "rejects RenameHousehold on non-existent household" do
+      household = %Household{created: false}
+      cmd = %RenameHousehold{household_id: "hh-uuid-1", name: "Name"}
+
+      assert {:error, :not_found} = Household.execute(household, cmd)
     end
   end
 end
