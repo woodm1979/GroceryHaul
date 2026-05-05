@@ -160,7 +160,7 @@ Retire the `HouseholdMembership` per-member aggregate and consolidate all member
 
 ## Section 5: Process manager for household creation
 
-**Status:** [ ] not started
+**Status:** [x] complete
 **Model:** sonnet
 **User stories covered:** 5
 
@@ -170,10 +170,10 @@ Add `GroceryHaul.Households.HouseholdCreationProcessManager` — a Commanded pro
 
 ### Acceptance criteria
 
-- [ ] Dispatching `CreateHousehold` alone (no manual `JoinHousehold`) results in a `MemberJoined` event for `created_by` being emitted.
-- [ ] `create_household/2` in `lib/grocery_haul/households.ex` dispatches only one command.
-- [ ] If the process manager fails to dispatch `JoinHousehold`, no memberless household is silently accepted (the failure surfaces as an error or is retried per Commanded's process manager retry semantics).
-- [ ] Existing integration tests for household creation pass.
+- [x] Dispatching `CreateHousehold` alone (no manual `JoinHousehold`) results in a `MemberJoined` event for `created_by` being emitted.
+- [x] `create_household/2` in `lib/grocery_haul/households.ex` dispatches only one command.
+- [x] If the process manager fails to dispatch `JoinHousehold`, no memberless household is silently accepted (the failure surfaces as an error or is retried per Commanded's process manager retry semantics).
+- [x] Existing integration tests for household creation pass.
 
 ### Notes for executor
 
@@ -185,10 +185,9 @@ Add `GroceryHaul.Households.HouseholdCreationProcessManager` — a Commanded pro
 
 ### Completion log
 
-<!-- Executor fills in after section completes -->
-- Commits:
-- Tests added:
-- Deviations from plan:
+- Commits: b463ae819c519b1223aea362d9882c4834b9f561
+- Tests added: 4
+- Deviations from plan: none
 
 ---
 
