@@ -3,7 +3,7 @@
 > PRD: ./2026-05-04-phase3-infra-domain-PRD.md
 > Executor: /build
 > Worktree: /Users/woodnt/Code/src/github.com/woodm1979/GroceryHaul-worktrees/phase3-infra-domain
-> Created: 2026-05-04  |  Last touched: 2026-05-05
+> Created: 2026-05-04  |  Last touched: 2026-05-04
 
 ## Architectural decisions
 
@@ -59,7 +59,7 @@ Add `GroceryHaul.EventStore.reset!()` to the `DataCase` setup callback so EventS
 
 ## Section 2: Dialyzer CI job
 
-**Status:** [ ] not started
+**Status:** [x] complete
 **Model:** haiku
 **User stories covered:** 2
 
@@ -69,10 +69,10 @@ Add a `dialyzer` job to `.github/workflows/ci.yml` with PLT caching so dialyzer 
 
 ### Acceptance criteria
 
-- [ ] `.github/workflows/ci.yml` contains a `dialyzer` job.
-- [ ] The job caches the PLT under a key that includes `mix.lock` and `.mise.toml`.
-- [ ] The job runs `mix dialyzer --halt-exit-status` (or equivalent) and fails CI if dialyzer finds errors.
-- [ ] The job runs on both `push` and `pull_request` events.
+- [x] `.github/workflows/ci.yml` contains a `dialyzer` job.
+- [x] The job caches the PLT under a key that includes `mix.lock` and `.mise.toml`.
+- [x] The job runs `mix dialyzer --halt-exit-status` (or equivalent) and fails CI if dialyzer finds errors.
+- [x] The job runs on both `push` and `pull_request` events.
 
 ### Notes for executor
 
@@ -84,10 +84,9 @@ Add a `dialyzer` job to `.github/workflows/ci.yml` with PLT caching so dialyzer 
 
 ### Completion log
 
-<!-- Executor fills in after section completes -->
-- Commits:
-- Tests added:
-- Deviations from plan:
+- Commits: 00eab50
+- Tests added: 5
+- Deviations from plan: none
 
 ---
 
