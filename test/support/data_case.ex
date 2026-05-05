@@ -33,12 +33,7 @@ defmodule GroceryHaul.DataCase do
     :ok
   end
 
-  @doc """
-  Resets the event store between tests.
-  In the test environment, Commanded uses the InMemory adapter.
-  Clears streams/events and stops all aggregate processes so their cached
-  state is flushed, without touching subscription (projector) processes.
-  """
+  # Projector processes are intentionally left running — only aggregate state is flushed.
   def reset_event_store do
     event_store = Module.concat([GroceryHaul.Commanded.Application, EventStore])
 
