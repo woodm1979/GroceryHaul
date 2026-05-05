@@ -59,3 +59,13 @@ OAuth (ueberauth) is explicitly deferred — the username/password layer is desi
 ## Open questions
 
 - [ ] Hashed password in `UserRegistered` event: acceptable to persist in the event log permanently? Alternative: keep credentials in a separate Ecto table (`user_credentials`) that is updated directly and never event sourced, using the User aggregate only for non-credential identity events. Resolve before implementing Section 1.
+
+## Future Considerations
+
+- **Password reset / forgot-password flow**: currently out of scope but will be needed before any real-user launch; the `UserToken` table pattern is already in place and can support email-based reset tokens.
+- **OAuth / social login**: deferred per the PRD; when added, the `User` aggregate identity model should remain the canonical user ID, with OAuth credentials stored in a separate `user_identities` table to avoid coupling event history to provider tokens.
+- **Email confirmation**: registration currently accepts any email without verification; adding a confirmation step would require a new command (`ConfirmEmail` → `EmailConfirmed`) and a `UserToken`-style pending-confirmation record.
+- **Sole-admin guard location**: the current implementation reads `HouseholdMembersProjection` before dispatching `DemoteAdmin` to enforce the sole-admin constraint. This is a TOCTOU race; a more robust approach would move the guard into the aggregate by projecting member count/roles into aggregate state, at the cost of increased aggregate state size.
+- **Process manager for household creation**: the creator's membership is currently created via two sequential dispatches in `create_household/2`. A dedicated process manager on `HouseholdCreated` would make this atomic and remove the partial-creation failure window.
+- **Household deletion**: no command exists to dissolve a household. If all members leave, the household projection persists as an orphan. A `DissolveHousehold` command with a "last admin leaving triggers dissolution" rule would close this gap.
+- **Audit trail / event replay UI**: the event store accumulates a full audit trail of all membership changes, renames, and join code regenerations. A simple admin view that streams the event log for a household could be valuable for debugging or moderation without requiring new domain logic.
