@@ -29,7 +29,29 @@ defmodule GroceryHaul.DataCase do
 
   setup tags do
     GroceryHaul.DataCase.setup_sandbox(tags)
+    GroceryHaul.DataCase.reset_event_store()
     :ok
+  end
+
+  @doc """
+  Resets the event store between tests.
+  In the test environment, Commanded uses the InMemory adapter.
+  Clears streams/events and stops all aggregate processes so their cached
+  state is flushed, without touching subscription (projector) processes.
+  """
+  def reset_event_store do
+    event_store = Module.concat([GroceryHaul.Commanded.Application, EventStore])
+    aggregates_sup = Module.concat([GroceryHaul.Commanded.Application, Commanded.Aggregates.Supervisor])
+
+    :sys.replace_state(event_store, fn state ->
+      %{state | streams: %{}, persisted_events: [], next_event_number: 1}
+    end)
+
+    for {_, pid, _, _} <- DynamicSupervisor.which_children(aggregates_sup) do
+      DynamicSupervisor.terminate_child(aggregates_sup, pid)
+    end
+  rescue
+    _ -> :ok
   end
 
   @doc """
