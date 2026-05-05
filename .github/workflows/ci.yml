@@ -87,6 +87,46 @@ jobs:
         env:
           MIX_ENV: test
 
+  dialyzer:
+    name: Dialyzer
+    runs-on: ubuntu-latest
+
+    env:
+      MIX_ENV: dev
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          version-file: .mise.toml
+          version-type: strict
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock', '.mise.toml') }}
+          restore-keys: ${{ runner.os }}-mix-
+
+      - name: Restore PLT cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            _build/dev/*.plt
+            _build/dev/PLT/
+          key: ${{ runner.os }}-dialyzer-${{ hashFiles('**/mix.lock', '.mise.toml') }}
+          restore-keys: ${{ runner.os }}-dialyzer-
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Run Dialyzer
+        run: mix dialyzer --halt-exit-status
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
